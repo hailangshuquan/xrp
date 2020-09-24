@@ -1,0 +1,93 @@
+<html>
+
+<head>
+	<script src="js/bip39/wordlist_english.js"></script>
+	<script src="js/bip39/sjcl-bip39.js"></script>
+	<script src="js/bip39/jsbip39.js"></script>
+
+	<script src="js/ripple/base58.js"></script>
+	<script src="js/ripple/ripple-0.7.19.js"></script>
+	<script src="js/ripple/sjcl.js"></script>
+	<script src="js/ripple/types.js"></script>
+
+	<script src="js/rippleSimple.js"></script>
+	<script>		
+		function importMnemonic(){ 		// 导入助记词生成私钥和地址
+			var res = createAddressWithMnemonic('beauty beauty crater flip crime alone ribbon marble tunnel sunny beauty interest')
+			console.log("..."+res) 
+		}
+		function importPrivateKey(){ 	// 导入私钥生成地址
+			var res = createAddressWithPrivateKey('sndRSjNu1L3dvHw5szNdKdpem742S')
+			console.log("..."+res)
+		}
+		function signTx(){				// 用私钥签名交易
+			var tx = '{"TransactionType": "Payment", "Account": "r9rFyy3qcEwYCoT4gKff669rosT7ZV9eRV", "Destination": "rLe2LhAARDyu5S1HQAAtPUXyWgHembXEvr", "Amount": "5000", "Fee": "0.000012", "Sequence" : 57027888 }';
+			var signed = signTransaction('shwFey6oSzeMUiDFk8vJkyAgFdsQR',tx);
+			console.log(signed);
+		}
+		function createOffer(){ 	
+			// 用XRP换USD
+			// 签名币币交换: r9rFyy3qcEwYCoT4gKff669rosT7ZV9eRV卖1个XRP,手续费为12drops,卖给rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B，换得0.22USD
+			//var tx = '{"TransactionType": "OfferCreate", "Account": "r9rFyy3qcEwYCoT4gKff669rosT7ZV9eRV", "Fee": "0.000012", "Sequence": 57027890, "TakerGets": "1000000", "TakerPays": {"currency": "USD", "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B", "value": "0.22"}}'
+
+			// 用USD买XRP
+			//var tx = '{"TransactionType": "OfferCreate","Account": "r9rFyy3qcEwYCoT4gKff669rosT7ZV9eRV","Fee": "0.000012","Sequence": 57027894,"TakerPays": "5000000", "TakerGets": {"currency": "USD","issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B","value": "1.1233"}}'
+
+			// 用XRP换ETH
+			//var tx = '{"TransactionType": "OfferCreate", "Account": "r9rFyy3qcEwYCoT4gKff669rosT7ZV9eRV", "Fee": "0.000012", "Sequence": 57027895, "TakerGets": "1000000", "TakerPays": {"currency": "ETH", "issuer": "rcA8X3TVMST1n3CJeAdGk1RdRCHii7N2h", "value": "0.0006962"}}'
+
+			// 用XRP换BTC
+			var tx = '{"TransactionType": "OfferCreate", "Account": "r9rFyy3qcEwYCoT4gKff669rosT7ZV9eRV", "Fee": "0.000012", "Sequence": 57027896, "TakerGets": "1000000", "TakerPays": {"currency": "BTC", "issuer": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B", "value": "0.0000199"}}'
+
+			var signed = signTransaction('shwFey6oSzeMUiDFk8vJkyAgFdsQR',tx);
+			console.log(signed);
+		}
+		function cancelOffer(){
+			// OfferSequence: 之前下订单时的号
+			var tx = '{"TransactionType": "OfferCancel","Account": "r9rFyy3qcEwYCoT4gKff669rosT7ZV9eRV","Fee": "0.000012","OfferSequence": 57027892,"Sequence": 57027893}';
+			var signed = signTransaction('shwFey6oSzeMUiDFk8vJkyAgFdsQR',tx);
+			console.log(signed);
+		}
+		
+		//! 开通网关//TODO
+		function DefaultRipplingOPEN(){
+			var tx = '{"TransactionType": "AccountSet","Account": "rwoSKJmWPb39XbExEDKx7wdbXvkZeRyej9","SetFlag":8,"Fee": "0.000012","Sequence": 577136548}';
+			var signed = signTransaction('shdEf3ue2ebZCMfHNzJf4P2KxNKhR',tx);
+			console.log(signed);
+		}
+		
+		//! 关闭网关//TODO
+		function DefaultRipplingCLOSE(){
+			var tx = '{"TransactionType": "AccountSet","Account": "rwoSKJmWPb39XbExEDKx7wdbXvkZeRyej9","Fee": "0.000012","Sequence": 57713652,"ClearFlag":8}';
+			var signed = signTransaction('shdEf3ue2ebZCMfHNzJf4P2KxNKhR',tx);
+			console.log(signed);
+		}
+		
+		//! 授信网关
+		function setLimit(){				
+			var tx = '{"TransactionType": "TrustSet", "Account": "rLe2LhAARDyu5S1HQAAtPUXyWgHembXEvr", "LimitAmount": {"currency": "DBA", "issuer": "rwoSKJmWPb39XbExEDKx7wdbXvkZeRyej9", "value": "1000000"}, "Fee": "0.000012", "Sequence" : 57713649 }';
+			var signed = signTransaction('sp8jh86H5WeWrtPKaA6XnQi7Bn62o',tx);
+			console.log(signed);
+		}
+		
+		//! 发送代币
+		function signTxToken(){				
+			var tx = '{"TransactionType": "Payment", "Account": "rwoSKJmWPb39XbExEDKx7wdbXvkZeRyej9", "Destination": "rLe2LhAARDyu5S1HQAAtPUXyWgHembXEvr", "Amount": {"currency": "DBA", "issuer": "rLe2LhAARDyu5S1HQAAtPUXyWgHembXEvr", "value": "86"}, "Fee": "0.000012", "Sequence" : 57713649 }';
+			var signed = signTransaction('shdEf3ue2ebZCMfHNzJf4P2KxNKhR',tx);
+			console.log(signed);
+		}
+	</script>
+</head>
+<body>
+	<button class="btn mnemonic" onclick="importMnemonic()">importMnemonic</button>
+	<button class="btn privateKey" onclick="importPrivateKey()">importPrivateKey</button>
+	<button class="btn signTx" onclick="signTx()">signTx</button>
+	<button class="btn createOffer" onclick="createOffer()">createoffer</button>
+	<button class="btn cancelOffer" onclick="cancelOffer()">canceloffer</button>
+	<button class="btn DefaultRipplingOPEN" onclick="DefaultRipplingOPEN()">DefaultRipplingOPEN</button>
+	<button class="btn DefaultRipplingCLOSE" onclick="DefaultRipplingCLOSE()">DefaultRipplingCLOSE</button>
+	<button class="btn setLimit" onclick="setLimit()">setLimit</button>
+	<button class="btn signTxToken" onclick="signTxToken()">signTxToken</button>
+</body>
+
+</html>
